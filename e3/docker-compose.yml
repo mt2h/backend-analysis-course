@@ -1,0 +1,45 @@
+services:
+  pg:
+    build: ./pg
+    container_name: pge1
+    environment:
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "15432:5432"
+
+  backend1:
+    build: ./backend
+    container_name: nodeapp1e3
+    command: ["node", "index1.mjs"]
+    environment:
+      PGHOST: pg
+      PGPORT: 5432
+      PGDATABASE: postgres
+      PGUSER: postgres
+      PGPASSWORD: postgres
+    depends_on:
+      - pg
+
+  backend2:
+    build: ./backend
+    container_name: nodeapp2e3
+    command: ["node", "index2.mjs"]
+    environment:
+      PGHOST: pg
+      PGPORT: 5432
+      PGDATABASE: postgres
+      PGUSER: postgres
+      PGPASSWORD: postgres
+    depends_on:
+      - pg
+
+  nginx:
+    image: nginx:latest
+    container_name: nginxe3
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    ports:
+      - "8888:8888"
+    depends_on:
+      - backend1
+      - backend2
